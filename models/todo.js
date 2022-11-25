@@ -20,8 +20,8 @@ module.exports = (sequelize, DataTypes) => {
       console.log("Overdue")
       console.log(
         (await Todo.overdue())
-        .map((item) => {
-          return item.displayableString()
+        .map((todo) => {
+          return todo.displayableString()
         }).join("\n")
       );
       console.log("\n");
@@ -30,7 +30,7 @@ module.exports = (sequelize, DataTypes) => {
       
       console.log(
         (await Todo.dueToday())
-        .map((item) => item.displayableString())
+        .map((todo) => todo.displayableString())
         .join("\n")
       );
       console.log("\n");
@@ -38,13 +38,13 @@ module.exports = (sequelize, DataTypes) => {
       console.log("Due Later")
       console.log(
         (await Todo.dueLater())
-        .map((item) => item.displayableString()).join("\n")
+        .map((todo) => todo.displayableString()).join("\n")
       );
       console.log("\n");
      }
 
      static async overdue(){
-      return Todo.findAll({
+      return await Todo.findAll({
         where: {
           dueDate: {
             [Op.lt]: new Date(),
@@ -56,7 +56,7 @@ module.exports = (sequelize, DataTypes) => {
      }
 
      static async dueToday(){
-      return Todo.findAll({
+      return await Todo.findAll({
         where: {
           dueDate: {
             [Op.eq]: new Date(),
@@ -68,7 +68,7 @@ module.exports = (sequelize, DataTypes) => {
      }
 
      static async dueLater(){
-      return Todo.findAll({
+      return await Todo.findAll({
         where: {
           dueDate: {
             [Op.gt]: new Date(),
@@ -93,7 +93,11 @@ module.exports = (sequelize, DataTypes) => {
 
     displayableString() {
       let checkbox = this.completed ? "[x]" : "[ ]";
-      return `${this.id}. ${checkbox} ${this.title} ${this.dueDate}`
+      return `${this.id}. ${checkbox} ${this.title} ${
+      this.dueDate== new Date()
+          ? ""
+          : this.dueDate
+      }`.trim();
   }
 }
   Todo.init({
